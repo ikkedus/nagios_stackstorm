@@ -1,4 +1,4 @@
 ---
 name: host_state_change
-pack: nagios
+pack: nagios_edit
 description: 'Trigger type for nagios service state change event.'
