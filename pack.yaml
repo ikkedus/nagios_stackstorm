@@ -1,0 +1,11 @@
+---
+ref: nagios_edit
+name : nagios_edit
+description : Nagios Monitoring integration
+keywords:
+  - nagios
+  - monitoring
+  - alerting
+version : 0.1.0
+author : Martin van der Gragt
+email : martin.vandergragt@cyso.com
