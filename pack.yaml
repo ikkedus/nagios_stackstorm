@@ -1,6 +1,6 @@
 ---
-ref: nagios_edit
-name : nagios_edit
+ref: nagios
+name : nagios
 description : Nagios Monitoring integration
 keywords:
   - nagios
