@@ -43,13 +43,7 @@ ST2_TRIGGERS_PATH = 'triggertypes'
 ST2_TRIGGERTYPE_PACK = 'nagios'
 ST2_TRIGGERTYPE_NAME = 'host_state_change'
 ST2_TRIGGERTYPE_REF = '.'.join([ST2_TRIGGERTYPE_PACK, ST2_TRIGGERTYPE_NAME])
-
-STATE_MESSAGE = {
-    'OK': 'All is well on the Western front.',
-    'WARNING': 'We gots a warning yo!',
-    'UNKNOWN': 'It be unknown...',
-    'CRITICAL': 'Critical!'
-}
+NAGIOS_ARGUMENTS = []
 
 REGISTERED_WITH_ST2 = False
 UNAUTHED = False
@@ -261,6 +255,7 @@ def _set_config_opts(config_file, verbose=False):
     global ST2_SSL_VERIFY
     global UNAUTHED
     global IS_API_KEY_AUTH
+    global NAGIOS_ARGUMENTS
     if not os.path.exists(config_file):
         print('Configuration file "{0}" not found. Exiting!!!'
               .format(config_file))
@@ -274,6 +269,7 @@ def _set_config_opts(config_file, verbose=False):
 
         ST2_USERNAME = config['st2_username']
         ST2_PASSWORD = config['st2_password']
+        NAGIOS_ARGUMENTS = config['host_args']
         ST2_API_KEY = config.get('st2_api_key', None)
         ST2_API_BASE_URL = config['st2_api_base_url']
         if not ST2_API_BASE_URL.endswith('/'):
@@ -304,27 +300,15 @@ def _set_config_opts(config_file, verbose=False):
             sys.exit(1)
 
 
-def _from_arg_to_payload(nagios_args):
-    try:
-        event_id = nagios_args[0]
-        output = nagios_args[4]
-        state = nagios_args[1]
-        state_type = nagios_args[2]
-        downtime = nagios_args[3]
-        host = nagios_args[5]
-    except IndexError:
-        traceback.print_exc(limit=20)
-        print('Number of Arguments given to the handler are incorrect')
-        sys.exit(1)
+def _from_arg_to_payload(nagios_args,config_file):
 
-    payload = {}
-    payload['host'] = host
-    payload['downtime'] = downtime
-    payload['event_id'] = event_id
-    payload['state'] = state
-    payload['msg'] = output
-    payload['state_type'] = state_type
-    return payload
+     with open(config_file) as f:
+        config = yaml.safe_load(f)
+        args = config['host_args']
+        payload = {}
+        for x in range(len(args)):
+            payload[args[x].replace("$","").lower()] = nagios_args[x]
+        return payload
 
 
 def main(config_file, payload, verbose=False):
@@ -346,7 +330,7 @@ if __name__ == '__main__':
                         help='Verbose mode.')
 
     args, nagios_args = parser.parse_known_args()
-    payload = _from_arg_to_payload(nagios_args)
+    payload = _from_arg_to_payload(nagios_args,args.config_path)
 
     main(config_file=args.config_path, payload=payload, verbose=args.verbose)
 

@@ -3,7 +3,25 @@
   st2_api_key: ""
   st2_username: ""
   st2_password: ""
-  st2_api_base_url: "https://localhost/api/v1/"
-  st2_auth_base_url: "https://localhost/auth/v1/"
+  st2_api_base_url: "https://185.78.196.237/api/v1/"
+  st2_auth_base_url: "https://185.78.196.237/auth/v1/"
   unauthed: False
   ssl_verify: False
+  host_args: 
+    - $HOSTEVENTID$
+    - $HOSTSTATE$
+    - $HOSTSTATETYPE$
+    - $HOSTDOWNTIME$
+    - $NOTIFICATIONTYPE$
+    - $NOTIFICATIONCOMMENT$
+    - $HOSTOUTPUT$
+    - $HOSTNAME$
+  service_args:
+    - $SERVICEEVENTID$
+    - $SERVICESTATEID$
+    - $SERVICESTATE$
+    - $SERVICESTATETYPE$
+    - "$SERIVCEDESC$"
+    - $SERVICEATTEMPT$
+    - $SERVICEDOWNTIME$
+    - $HOSTNAME$

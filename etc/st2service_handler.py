@@ -304,30 +304,15 @@ def _set_config_opts(config_file, verbose=False):
             sys.exit(1)
 
 
-def _from_arg_to_payload(nagios_args):
-    try:
-        event_id = nagios_args[0]
-        service = nagios_args[1]
-        state = nagios_args[2]
-        state_id = nagios_args[3]
-        state_type = nagios_args[4]
-        attempt = nagios_args[5]
-        host = nagios_args[6]
-    except IndexError:
-        traceback.print_exc(limit=20)
-        print('Number of Arguments given to the handler are incorrect')
-        sys.exit(1)
+def _from_arg_to_payload(nagios_args,config_file):
 
-    payload = {}
-    payload['host'] = host
-    payload['service'] = service
-    payload['event_id'] = event_id
-    payload['state'] = state
-    payload['state_id'] = state_id
-    payload['state_type'] = state_type
-    payload['attempt'] = attempt
-    payload['msg'] = STATE_MESSAGE.get(state, 'Undefined state.')
-    return payload
+     with open(config_file) as f:
+        config = yaml.safe_load(f)
+        args = config['service_args']
+        payload = {}
+        for x in range(len(args)):
+            payload[args[x].replace("$","").lower()] = nagios_args[x]
+        return payload
 
 
 def main(config_file, payload, verbose=False):
@@ -349,6 +334,6 @@ if __name__ == '__main__':
                         help='Verbose mode.')
 
     args, nagios_args = parser.parse_known_args()
-    payload = _from_arg_to_payload(nagios_args)
+    payload = _from_arg_to_payload(nagios_args,args.config_file)
 
     main(config_file=args.config_path, payload=payload, verbose=args.verbose)
